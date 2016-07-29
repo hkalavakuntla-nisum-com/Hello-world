@@ -5,26 +5,50 @@ buildscript {
     repositories {
         mavenCentral()
     }
+    dependencies {
+        classpath "org.gradle.api.plugins:gradle-cargo-plugin:$gradleCargoPluginVersion"
+    }
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'cargo'
 
 repositories {
     mavenCentral()
 }
 
+
 dependencies {
+    compile 'org.springframework:spring-webmvc:4.1.6.RELEASE'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-dependencies {
-}
-
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
+}
+
+
+cargo {
+
+    port = Integer.parseInt(cargoPort)
+
+    remote {
+        hostname = cargoHost
+    }
+
+    containerId = 'tomcat6x'
+
+    local {
+       // homeDir = file("${rootProject.buildDir}/extract/apache-tomcat-6.0.35")
+        jvmArgs = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+        installer {
+            downloadDir = file("${rootProject.buildDir}/download")
+            extractDir = file("${rootProject.buildDir}/extract")
+        }
+    }
 }
